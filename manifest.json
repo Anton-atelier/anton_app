@@ -1,6 +1,6 @@
 {
-  "name": "HairCraft App",
-  "short_name": "HairCraft",
+  "name": "AntonAtelier App",
+  "short_name": "AntonAtelier",
   "start_url": "/barber-app/index_premium.html",
   "display": "standalone",
   "background_color": "#020202",
