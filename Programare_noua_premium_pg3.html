@@ -945,6 +945,7 @@
     var oraSelectataIndex = null;
     var confirmata = false;
     var salvareSupabaseFinalizata = false;
+    var programareIdSalvata = null;
 
     var zile = [];
     var zileNume = ['Du', 'Lu', 'Ma', 'Mi', 'Joi', 'Vi', 'Sa'];
@@ -1341,7 +1342,7 @@
           console.log('EROARE SUPABASE PROGRAMARE:', error);
         } else if (data && data.id) {
           programareNoua.id = data.id;
-          localStorage.setItem('programare_rezultat', JSON.stringify(programareNoua));
+          programareIdSalvata = data.id;
           salvareSupabaseFinalizata = true;
         }
       } catch(e) {
@@ -1393,7 +1394,7 @@
         return;
       }
 
-      window.location.href = 'Programare_noua_premium_pg4.html';
+      window.location.href = 'Programare_noua_premium_pg4.html?id=' + encodeURIComponent(programareIdSalvata);
     }
 
     init();
