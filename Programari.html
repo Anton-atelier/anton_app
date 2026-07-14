@@ -829,6 +829,7 @@ async function trimiteConfirmare(id) {
   if (!p || !p.client || !p.client.telefon) return;
 
   const tel = p.client.telefon.replace(/[^0-9]/g, '');
+  alert("Programari.html - trimiteConfirmare");
   const mesaj = encodeURIComponent(
 `*Anton Atelier*
 
