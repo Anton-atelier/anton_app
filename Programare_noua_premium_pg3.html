@@ -938,7 +938,7 @@
   </div>
 
   <script>
-    var durataSelectata = Number(localStorage.getItem('programare_durata') || 60);
+    var durataSelectata = Number(new URLSearchParams(window.location.search).get('durata') || 60);
     var sloturiNecesare = durataSelectata / 30;
     var client = null;
     var ziSelectataIndex = 0;
@@ -966,12 +966,27 @@
     var ocupatePeZile = [[], [], [], [], [], [], []];
 
     async function init() {
-      try { client = JSON.parse(localStorage.getItem('programare_client') || 'null'); } catch(e) {}
-      if (!client) {
-        location.href = 'Programare_noua_premium_pg1.html';
+      const clientId = new URLSearchParams(window.location.search).get('client_id');
+
+      if (!clientId) {
+        window.location.href = 'Programare_noua_premium_pg1.html';
         return;
       }
 
+      const { data: clientData, error: clientError } = await supabaseClient
+        .from('clienti')
+        .select('id,nume,telefon')
+        .eq('id', clientId)
+        .single();
+
+      if (clientError || !clientData) {
+        console.log('EROARE ÎNCĂRCARE CLIENT PG3:', clientError);
+        alert('Clientul nu a putut fi încărcat.');
+        window.location.href = 'Programare_noua_premium_pg1.html';
+        return;
+      }
+
+      client = clientData;
       document.getElementById('clientName').textContent = client.nume || '-';
       document.getElementById('durationText').textContent = durataSelectata + ' minute';
 
@@ -1317,8 +1332,6 @@
         interval: getIntervalText()
       };
 
-      localStorage.setItem('programare_rezultat', JSON.stringify(programareNoua));
-
       /* BLOC SUPABASE - SALVARE PROGRAMARE */
       try {
         const { data, error } = await supabaseClient
@@ -1361,11 +1374,11 @@
     }
 
     function changeDuration() {
-      window.location.href = 'Programare_noua_premium_pg2.html';
+      window.location.href = 'Programare_noua_premium_pg2.html?client_id=' + encodeURIComponent(client.id);
     }
 
     function goBack() {
-      window.location.href = 'Programare_noua_premium_pg2.html';
+      window.location.href = 'Programare_noua_premium_pg2.html?client_id=' + encodeURIComponent(client.id);
     }
 
     function goHome() {
@@ -1394,7 +1407,7 @@
         return;
       }
 
-      window.location.href = 'Programare_noua_premium_pg4.html?id=' + encodeURIComponent(programareIdSalvata);
+      window.location.href = 'Programare_noua_premium_pg4.html?id=' + encodeURIComponent(programareIdSalvata) + '&client_id=' + encodeURIComponent(client.id) + '&durata=' + encodeURIComponent(durataSelectata);
     }
 
     init();
