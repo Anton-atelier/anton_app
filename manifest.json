@@ -1,7 +1,7 @@
 {
-  "name": "AntonAtelier App",
-  "short_name": "AntonAtelier",
-  "start_url": "/barber-app/index_premium.html",
+  "name": "Anton Atelier",
+  "short_name": "Anton Atelier",
+  "start_url": "/anton_app/index_premium.html",
   "display": "standalone",
   "background_color": "#020202",
   "theme_color": "#020202",
