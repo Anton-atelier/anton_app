@@ -649,7 +649,6 @@
               <div class="client-name">${escapeHtml(c.nume)}</div>
               <div class="client-details">${escapeHtml(c.telefon)} · Programări: ${Number(c.nr_programari || 0)}</div>
             </div>
-            ${c.v2_trimisa !== true ? `<button onclick="trimiteV2(event, '${c.id}')" style="background:#d71920;color:#fff;font-size:10px;border:none;border-radius:8px;padding:4px 6px;margin-right:4px;cursor:pointer;">V2</button>` : ``}
             <div class="arrow">›</div>
           </div>
         `;
