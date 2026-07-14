@@ -652,7 +652,6 @@
     document.querySelector(".selected-name").innerText = client.nume || "";
     document.querySelector(".selected-phone").innerText = client.telefon || "";
     clientSelectat = client;
-    localStorage.setItem("programare_client", JSON.stringify(client));
   }
 
 function goBack() {
@@ -668,7 +667,7 @@ function goBack() {
       alert('Alege clientul înainte de NEXT.');
       return;
     }
-    window.location.href = 'Programare_noua_premium_pg2.html';
+    window.location.href = 'Programare_noua_premium_pg2.html?client_id=' + encodeURIComponent(clientSelectat.id);
   }
 
   loadClientsFromSupabase();
