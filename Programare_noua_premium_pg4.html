@@ -584,21 +584,55 @@ MODIFICARI:
   </div>
 
   <script>
-    var durataSelectata = Number(localStorage.getItem('programare_durata') || 60);
-    var client = null;
+    var programare = null;
 
-    function init() {
-      try {
-        client = JSON.parse(localStorage.getItem('programare_client') || 'null');
-      } catch(e) {}
+    function getProgramareId() {
+      return new URLSearchParams(window.location.search).get('id');
+    }
 
-      if (!client) {
-        window.location.href = 'Programare_noua_premium_pg1.html';
+    function calculeazaDurata(oraStart, oraFinal) {
+      if (!oraStart || !oraFinal) return 0;
+      const [hs, ms] = oraStart.slice(0, 5).split(':').map(Number);
+      const [hf, mf] = oraFinal.slice(0, 5).split(':').map(Number);
+      return (hf * 60 + mf) - (hs * 60 + ms);
+    }
+
+    function formateazaData(dataIso) {
+      const d = new Date(dataIso + 'T12:00:00');
+      return d.toLocaleDateString('ro-RO', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long'
+      }).toUpperCase();
+    }
+
+    async function init() {
+      const id = getProgramareId();
+
+      if (!id) {
+        alert('Lipsește identificatorul programării.');
+        window.location.href = 'Programare_noua_premium_pg3.html';
         return;
       }
 
-      document.getElementById('clientName').textContent = client.nume || '-';
-      document.getElementById('durationText').textContent = durataSelectata + ' minute';
+      const { data, error } = await supabaseClient
+        .from('programari')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        console.log('EROARE ÎNCĂRCARE PROGRAMARE PG4:', error);
+        alert('Programarea nu a putut fi încărcată.');
+        window.location.href = 'Programare_noua_premium_pg3.html';
+        return;
+      }
+
+      programare = data;
+      const durata = calculeazaDurata(data.ora_start, data.ora_final);
+
+      document.getElementById('clientName').textContent = data.nume_client || '-';
+      document.getElementById('durationText').textContent = durata + ' minute';
     }
 
     function goBack() {
@@ -609,50 +643,49 @@ MODIFICARI:
       window.location.href = 'index_premium.html';
     }
 
-    init();
     async function trimiteWhatsApp() {
+      if (!programare) {
+        alert('Programarea nu este încărcată.');
+        return;
+      }
 
-    var data = JSON.parse(localStorage.getItem('programare_rezultat') || 'null');
+      const titluZi = formateazaData(programare.data);
+      const interval = (programare.ora_start || '').slice(0, 5) + ' - ' + (programare.ora_final || '').slice(0, 5);
 
-    if (!data) {
-    alert("Nu există programare.");
-    return;
-    }
-
-  var mesaj =
-  `*Anton Atelier*
+      const mesaj =
+`*Anton Atelier*
 
 Bună ziua!
 
 ✅ Programarea Dvs. este confirmată:
 
-📅 *${p.zi.titlu}*
-🕒 *${p.interval}*
+📅 *${titluZi}*
+🕒 *${interval}*
 
-*Vă așteptăm cu drag!*`
-);
+*Vă așteptăm cu drag!*`;
 
-  var telefon = (client.telefon || "").replace(/\D/g, "");
-  var url = "https://wa.me/" + telefon + "?text=" + encodeURIComponent(mesaj);
+      let telefon = (programare.telefon || '').replace(/\D/g, '');
+      if (telefon.startsWith('0')) telefon = '40' + telefon.substring(1);
 
-  if (data.id) {
-    const rezultatUpdate = await supabaseClient
-      .from('programari')
-      .update({ confirmare_trimisa: true })
-      .eq('id', data.id)
-      .select();
+      if (!telefon) {
+        alert('Clientul nu are număr de telefon.');
+        return;
+      }
 
-    console.log('UPDATE CONFIRMARE SUPABASE:', rezultatUpdate);
+      const { error } = await supabaseClient
+        .from('programari')
+        .update({ confirmare_trimisa: true })
+        .eq('id', programare.id);
 
-    if (rezultatUpdate.error) {
-      console.log('EROARE CONFIRMARE SUPABASE:', rezultatUpdate.error);
+      if (error) {
+        console.log('EROARE CONFIRMARE SUPABASE:', error);
+      }
+
+      const url = 'https://wa.me/' + telefon + '?text=' + encodeURIComponent(mesaj);
+      window.location.href = url;
     }
-  } else {
-    console.log('PG4 FARA ID PROGRAMARE:', data);
-  }
 
-  window.location.href = url;
-}
+    init();
   </script>
 </body>
 </html>
