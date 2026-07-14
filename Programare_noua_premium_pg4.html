@@ -636,7 +636,17 @@ MODIFICARI:
     }
 
     function goBack() {
-      window.location.href = 'Programare_noua_premium_pg3.html';
+      const params = new URLSearchParams(window.location.search);
+      const clientId = params.get('client_id');
+      const durata = params.get('durata');
+
+      if (clientId && durata) {
+        window.location.href = 'Programare_noua_premium_pg3.html?client_id=' +
+          encodeURIComponent(clientId) + '&durata=' + encodeURIComponent(durata);
+        return;
+      }
+
+      window.location.href = 'Programare_noua_premium_pg1.html';
     }
 
     function goHome() {
