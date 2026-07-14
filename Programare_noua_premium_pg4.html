@@ -622,17 +622,15 @@ MODIFICARI:
   var mesaj =
   `*Anton Atelier*
 
-Buna ziua !
+Bună ziua!
 
 ✅ Programarea Dvs. este confirmată:
 
-📅 *${data.zi.titlu}*
-🕒 *Ora: ${data.interval}*
+📅 *${p.zi.titlu}*
+🕒 *${p.interval}*
 
-📍 Locație:
-*Str. Vaselor 10*
-
-Dacă nu puteți ajunge, vă rog să mă anunțați din timp. 🙏`;
+*Vă așteptăm cu drag!*`
+);
 
   var telefon = (client.telefon || "").replace(/\D/g, "");
   var url = "https://wa.me/" + telefon + "?text=" + encodeURIComponent(mesaj);
