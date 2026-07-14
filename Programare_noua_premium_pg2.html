@@ -755,6 +755,16 @@
 }
 
 </style>
+
+  <!-- BLOC SUPABASE - CONECTARE BAZĂ DE DATE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      'https://fkvshwwmqioqoeaeaygt.supabase.co',
+      'sb_publishable_xBhJExWwRGtxSibjUFQaiQ_vFu0Ua29'
+    );
+  </script>
+
 </head>
 
 <body>
@@ -855,7 +865,6 @@
 
       element.classList.add('selected');
       document.getElementById('selectedDuration').textContent = minutes + ' minute';
-      localStorage.setItem('programare_durata', String(minutes));
 
     }
 
@@ -869,15 +878,34 @@
       } catch (e) {}
     }
 
-    function init() {
-      try { client = JSON.parse(localStorage.getItem('programare_client') || 'null'); } catch(e) {}
-      if (!client) {
-        location.href = 'Programare_noua_premium_pg1.html';
+    function getClientId() {
+      return new URLSearchParams(window.location.search).get('client_id');
+    }
+
+    async function init() {
+      const clientId = getClientId();
+
+      if (!clientId) {
+        window.location.href = 'Programare_noua_premium_pg1.html';
         return;
       }
+
+      const { data, error } = await supabaseClient
+        .from('clienti')
+        .select('id,nume,telefon')
+        .eq('id', clientId)
+        .single();
+
+      if (error || !data) {
+        console.log('EROARE ÎNCĂRCARE CLIENT PG2:', error);
+        alert('Clientul nu a putut fi încărcat.');
+        window.location.href = 'Programare_noua_premium_pg1.html';
+        return;
+      }
+
+      client = data;
       document.getElementById('clientName').textContent = client.nume || '-';
       document.getElementById('clientPhone').textContent = client.telefon || '-';
-      localStorage.setItem('programare_durata', String(durataSelectata));
     }
 
     function goBack() {
@@ -889,8 +917,13 @@
     }
 
     function nextStep() {
-      localStorage.setItem('programare_durata', String(durataSelectata));
-      window.location.href = 'Programare_noua_premium_pg3.html';
+      if (!client || !client.id) {
+        alert('Clientul nu este încărcat.');
+        return;
+      }
+
+      window.location.href = 'Programare_noua_premium_pg3.html?client_id=' +
+        encodeURIComponent(client.id) + '&durata=' + encodeURIComponent(durataSelectata);
     }
 
     init();
