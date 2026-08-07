@@ -94,7 +94,7 @@
 
     .orar-grid {
       display: grid;
-      grid-template-columns: 74px repeat(7, 76px);
+      grid-template-columns: 74px repeat(30, 76px);
       min-width: 606px;
     }
 
@@ -323,7 +323,7 @@
       <div class="title">Orar</div>
     </div>
 
-    <div class="subtitle">Trage tabelul dreapta - stânga pentru toate cele 7 zile</div>
+    <div class="subtitle">Trage tabelul dreapta - stânga pentru toate cele 30 zile</div>
 
     <!-- BLOC HTML 3 - TABEL -->
     <div class="orar-wrapper">
@@ -357,7 +357,7 @@
     function getDays() {
       const zile = [];
 
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 30; i++) {
         const d = new Date();
         d.setDate(d.getDate() + i);
 
