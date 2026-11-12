@@ -644,7 +644,8 @@ const client = window.supabase.createClient(
       try {
         const { count, error } = await client
           .from('clienti')
-          .select('*', { count: 'exact', head: true });
+          .select('*', { count: 'exact', head: true })
+          .neq('nume', 'TEST AUTOMAT');
 
         if (error) {
           console.log('EROARE CLIENTI SUPABASE:', error);
